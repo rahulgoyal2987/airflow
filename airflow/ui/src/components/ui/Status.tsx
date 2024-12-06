@@ -16,23 +16,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Box, type BoxProps } from "@chakra-ui/react";
+import { Status as ChakraStatus } from "@chakra-ui/react";
+import * as React from "react";
 
-import type { TaskInstanceState } from "openapi/requests/types.gen";
+import type {
+  DagRunState,
+  TaskInstanceState,
+} from "openapi/requests/types.gen";
 import { stateColor } from "src/utils/stateColor";
 
-export const StateCircle = ({
-  state,
-  ...rest
-}: {
-  readonly state: TaskInstanceState;
-} & BoxProps) => (
-  <Box
-    {...rest}
-    bg={stateColor[state]}
-    borderRadius="50%"
-    h={2}
-    minW={2}
-    w={2}
-  />
+type StatusValue = DagRunState | TaskInstanceState;
+
+export type StatusProps = {
+  state?: StatusValue;
+} & ChakraStatus.RootProps;
+
+export const Status = React.forwardRef<HTMLDivElement, StatusProps>(
+  ({ children, state, ...rest }, ref) => {
+    const colorPalette = state === undefined ? "info" : stateColor[state];
+
+    return (
+      <ChakraStatus.Root ref={ref} {...rest}>
+        <ChakraStatus.Indicator bg={colorPalette} />
+        {children}
+      </ChakraStatus.Root>
+    );
+  },
 );
